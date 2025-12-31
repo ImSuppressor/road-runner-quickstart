@@ -13,11 +13,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+@Config
 @TeleOp
-public class LimelightModeOn extends OpMode {
+public class TurretTune extends OpMode {
     private PIDController controller;
 
-    public double p = 0.00055, i = 0.00015, d = 0.0145;
+    public static double p=0, i=0, d=0;
     private DcMotorEx turret;
     private Limelight3A limelight;
 
@@ -36,16 +37,19 @@ public class LimelightModeOn extends OpMode {
     @Override
     public void loop() {
         LLResult result = limelight.getLatestResult();
-        if (result.isValid() || limelight.getLatestResult() == null) {
+        if (result.isValid() & !(limelight.getLatestResult() == null) & gamepad1.a) {
 
-            double turretPosFromTargetInTicks = result.getTx()*7.35;
-            double pidPower = controller.calculate(turretPosFromTargetInTicks, 0.0);
+            double turretPosFromTargetInTicks = result.getTx();
+            double pidPower = controller.calculate(turretPosFromTargetInTicks, 0);
 
             turret.setPower(pidPower);
             telemetry.addData("pos", turret.getCurrentPosition());
             telemetry.addData("target", turretPosFromTargetInTicks);
             telemetry.addData("Tx", result.getTx());
             telemetry.addData("power", pidPower);
+        }
+        else {
+            turret.setPower(0);
         }
 
     }
